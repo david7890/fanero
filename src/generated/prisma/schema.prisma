@@ -1,0 +1,181 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Usuario
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  bio           String?   @db.Text
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Campos para creadores de contenido
+  isCreator          Boolean @default(false)
+  creatorDescription String? @db.Text
+  subscriptionPrice  Float?
+  bannerImage        String?
+  socialLinks        Json? // Para almacenar enlaces a redes sociales
+
+  // Relaciones
+  accounts      Account[]
+  sessions      Session[]
+  posts         Post[]
+  donations     Donation[]     @relation("ReceivedDonations")
+  sentDonations Donation[]     @relation("SentDonations")
+  comments      Comment[]
+  likes         Like[]
+  followers     Follow[]       @relation("Following")
+  following     Follow[]       @relation("Follower")
+  subscribers   Subscription[] @relation("Creator")
+  subscriptions Subscription[] @relation("Subscriber")
+}
+
+// Modelo de Cuenta (para NextAuth)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// Modelo de Sesión (para NextAuth)
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Modelo de Publicación
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  content     String   @db.Text
+  imageUrl    String?
+  published   Boolean  @default(true)
+  isExclusive Boolean  @default(false) // Indica si el post es solo para suscriptores
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments Comment[]
+  likes    Like[]
+}
+
+// Modelo de Comentario
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Modelo de Me gusta
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relaciones
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+}
+
+// Modelo de Donación
+model Donation {
+  id        String   @id @default(cuid())
+  amount    Float
+  currency  String   @default("USD")
+  message   String?  @db.Text
+  status    String   @default("completed") // pending, completed, failed
+  createdAt DateTime @default(now())
+
+  // Relaciones
+  fromUserId String
+  fromUser   User   @relation("SentDonations", fields: [fromUserId], references: [id])
+  toUserId   String
+  toUser     User   @relation("ReceivedDonations", fields: [toUserId], references: [id])
+}
+
+// Modelo de Seguidores
+model Follow {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relaciones
+  followerId  String
+  follower    User   @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User   @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+// Modelo de Token de Verificación (para NextAuth)
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Modelo de Suscripción
+model Subscription {
+  id        String    @id @default(cuid())
+  status    String    @default("active") // active, cancelled, expired
+  amount    Float
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relaciones
+  creatorId    String
+  creator      User   @relation("Creator", fields: [creatorId], references: [id], onDelete: Cascade)
+  subscriberId String
+  subscriber   User   @relation("Subscriber", fields: [subscriberId], references: [id], onDelete: Cascade)
+
+  @@unique([creatorId, subscriberId])
+}

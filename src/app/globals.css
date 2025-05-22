@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary: #f9fafb;
+  --secondary-dark: #f3f4f6;
+  --accent: #ec4899;
+  --accent-dark: #db2777;
+  --success: #10b981;
+  --error: #ef4444;
+  --border: #e5e7eb;
+  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --card-radius: 0.75rem;
+  --header-height: 70px;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f172a;
+    --foreground: #f1f5f9;
+    --primary: #818cf8;
+    --primary-dark: #6366f1;
+    --secondary: #1e293b;
+    --secondary-dark: #334155;
+    --accent: #f472b6;
+    --accent-dark: #ec4899;
+    --border: #334155;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+/* Estilos específicos para tarjetas */
+.card {
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Estilos para botones */
+.btn {
+  transition: all 0.2s ease;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Estilos específicos para botones en modo oscuro */
+.dark .bg-primary,
+.dark .bg-accent {
+  color: #ffffff; /* Asegurar texto blanco */
+}
+
+/* Estilos para botones con fondo blanco */
+.btn-black-text {
+  color: #171717 !important; /* Forzar texto negro */
+}
