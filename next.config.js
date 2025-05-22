@@ -20,7 +20,6 @@ const nextConfig = {
     unoptimized: true
   },
   reactStrictMode: true,
-  swcMinify: true,
 }
 
 module.exports = nextConfig 
