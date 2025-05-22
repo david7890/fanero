@@ -232,15 +232,14 @@ export default function ProfilePage() {
 
   const handleSubscribe = async () => {
     if (!session?.user) {
-      // Guardar la URL actual en localStorage antes de redirigir
-      localStorage.setItem('redirectAfterLogin', window.location.href);
-      // Redirigir a inicio de sesión
+      // Redirigir a inicio de sesión si no está autenticado
       window.location.href = `/auth/login?callbackUrl=/profile/${id}`;
       return;
     }
 
     try {
       setIsSubscribing(true);
+      setError("");
 
       const response = await fetch('/api/subscriptions', {
         method: 'POST',
@@ -251,23 +250,21 @@ export default function ProfilePage() {
           creatorId: id,
         }),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
-        throw new Error(data.message || 'Error al procesar la suscripción');
+        throw new Error(data.message || 'Error al suscribirse');
       }
-      
+
       setSubscriptionSuccess(true);
       setIsSubscribed(true);
       updateCacheAfterSubscription(true);
-      
-      setTimeout(() => {
-        setShowSubscribeModal(false);
-        setSubscriptionSuccess(false);
-      }, 2000);
+
+      // Actualizar los posts después de suscribirse
+      await fetchUpdatedPosts();
     } catch (error: any) {
-      setError(error.message || "Error al procesar la suscripción. Por favor, intenta de nuevo.");
+      setError(error.message || 'Error al suscribirse. Por favor, inténtalo de nuevo.');
     } finally {
       setIsSubscribing(false);
     }
@@ -304,33 +301,33 @@ export default function ProfilePage() {
   // Actualizar el caché después de cambiar la suscripción
   const updateCacheAfterSubscription = (newIsSubscribed: boolean) => {
     if (globalProfileCache[id as string]) {
-      globalProfileCache[id as string].isSubscribed = newIsSubscribed;
-      globalProfileCache[id as string].timestamp = Date.now();
-      
-      // Refrescar los posts si cambió el estado de suscripción
-      // para mostrar u ocultar contenido exclusivo
-      if (newIsSubscribed !== isSubscribed) {
-        // Reiniciar la carga de posts
-        const fetchUpdatedPosts = async () => {
-          try {
-            const response = await fetch(`/api/profile/${id}`);
-            if (response.ok) {
-              const data = await response.json();
-              if (data.success) {
-                setPosts(data.posts);
-                // Actualizar también los posts en caché
-                if (globalProfileCache[id as string]) {
-                  globalProfileCache[id as string].posts = data.posts;
-                }
-              }
-            }
-          } catch (error) {
-            console.error("Error refreshing posts after subscription change:", error);
-          }
-        };
-        
-        fetchUpdatedPosts();
+      globalProfileCache[id as string] = {
+        ...globalProfileCache[id as string],
+        isSubscribed: newIsSubscribed,
+        timestamp: Date.now()
+      };
+    }
+  };
+
+  const fetchUpdatedPosts = async () => {
+    try {
+      const response = await fetch(`/api/profile/${id}`);
+      if (!response.ok) {
+        throw new Error('Error al actualizar los posts');
       }
+      const data = await response.json();
+      if (data.success) {
+        setPosts(data.posts);
+        if (globalProfileCache[id as string]) {
+          globalProfileCache[id as string] = {
+            ...globalProfileCache[id as string],
+            posts: data.posts,
+            timestamp: Date.now()
+          };
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching updated posts:', error);
     }
   };
 
@@ -538,13 +535,13 @@ export default function ProfilePage() {
                       </button>
                     ) : (
                       <button 
-                        onClick={() => setShowSubscribeModal(true)}
+                        onClick={handleSubscribe}
                         className="px-8 py-3 bg-gray-900 hover:bg-black text-white rounded-full font-semibold transition shadow-md flex items-center dark:bg-blue-600 dark:hover:bg-blue-700"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
                         </svg>
-                        {session?.user ? `Suscribirse $${user?.subscriptionPrice?.toFixed(2)}/mes` : 'Crear cuenta para suscribirte'}
+                        {session?.user ? `Suscribirse $${user?.subscriptionPrice?.toFixed(2)}/mes` : 'Suscribirse'}
                       </button>
                     )}
                   </>
@@ -771,84 +768,6 @@ export default function ProfilePage() {
         </div>
       )}
 
-      {/* Modal de suscripción */}
-      {showSubscribeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl w-full max-w-md p-6 shadow-xl">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              {session?.user ? `Suscribirse a ${user?.name}` : 'Crear cuenta para suscribirte'}
-            </h3>
-            
-            {subscriptionSuccess ? (
-              <div className="text-center py-6">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-16 h-16 text-green-500 mx-auto mb-4">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                </svg>
-
-                <p className="text-lg font-semibold text-gray-900 dark:text-white">¡Gracias por suscribirte!</p>
-                <p className="text-gray-600 dark:text-gray-300 mt-1">Ahora tienes acceso al contenido exclusivo.</p>
-              </div>
-            ) : (
-              <>
-                <div className="mb-6">
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    {session?.user 
-                      ? `Al suscribirte obtendrás acceso al contenido exclusivo de ${user?.name}.`
-                      : 'Para acceder al contenido exclusivo, necesitas crear una cuenta.'}
-                  </p>
-                  
-                  {session?.user && (
-                    <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md mb-4">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-semibold text-gray-900 dark:text-white">Suscripción mensual</p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">Se renueva automáticamente</p>
-                        </div>
-                        <p className="font-bold text-xl text-gray-900 dark:text-white">${user?.subscriptionPrice?.toFixed(2)}</p>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {session?.user && (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Al suscribirte, aceptas procesar un pago mensual recurrente. Puedes cancelar en cualquier momento.
-                    </p>
-                  )}
-                </div>
-                
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => setShowSubscribeModal(false)}
-                    className="flex-1 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={handleSubscribe}
-                    disabled={isSubscribing}
-                    className="flex-1 py-2 px-4 bg-gray-900 hover:bg-black text-white rounded-md font-semibold disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-600 dark:hover:bg-blue-700"
-                  >
-                    {isSubscribing ? (
-                      <span className="flex items-center justify-center">
-                        <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Procesando...
-                      </span>
-                    ) : session?.user ? (
-                      `Suscribirme por $${user?.subscriptionPrice?.toFixed(2)}/mes`
-                    ) : (
-                      'Crear cuenta'
-                    )}
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Modal de compartir */}
       {showShareModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -922,7 +841,7 @@ export default function ProfilePage() {
                     className="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-500"
                   >
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
+                      <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.75h-2.54V8.25c0-2.209 1.791-4 4-4s4 1.791 4 4v1.5c0 2.209-1.791 4-4 4zm-10.5 4.5c-.828 0-1.5-.672-1.5-1.5s.672-1.5 1.5-1.5 1.5.672 1.5 1.5-.672 1.5-1.5 1.5-1.5zm10.5 0c.828 0 1.5.672 1.5 1.5s-.672 1.5-1.5 1.5-1.5-.672-1.5-1.5.672-1.5 1.5-1.5 1.5z" />
                     </svg>
                   </a>
                   <a 

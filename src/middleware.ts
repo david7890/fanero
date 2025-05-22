@@ -10,7 +10,10 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/auth') || 
     pathname.includes('_next') || 
     pathname.includes('api/auth') ||
-    pathname.includes('favicon.ico')
+    pathname.includes('favicon.ico') ||
+    pathname.startsWith('/profile/') ||  // Permitir acceso a perfiles sin autenticación
+    pathname.startsWith('/api/profile/') ||  // Permitir acceso a la API de perfiles sin autenticación
+    pathname === '/'  // Permitir acceso a la página principal
   ) {
     return NextResponse.next();
   }

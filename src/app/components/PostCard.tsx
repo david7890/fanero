@@ -51,7 +51,12 @@ const PostCard = memo(function PostCard({
 
   const handleImageClick = () => {
     if (isCreatorPost && !isSubscribed) {
-      setShowSubscriptionPrompt(true);
+      // Redirigir directamente a la página de login si no está autenticado
+      if (!session) {
+        window.location.href = `/auth/login?callbackUrl=/profile/${creatorId}`;
+      } else {
+        window.location.href = `/profile/${creatorId}`;
+      }
     }
   };
 
@@ -74,8 +79,8 @@ const PostCard = memo(function PostCard({
       <div className="p-4 flex items-center space-x-3">
         <div className="relative w-10 h-10">
           <Image
-            src={avatarSrc}
-            alt={`${username}'s avatar`}
+            src={avatarSrc || "/avatar-placeholder.jpg"}
+            alt="Avatar"
             className="rounded-full object-cover"
             fill
             sizes="40px"
@@ -182,34 +187,6 @@ const PostCard = memo(function PostCard({
       {showComments && (
         <div className="border-t border-gray-100 dark:border-gray-700 p-4">
           <p className="text-sm text-gray-500 dark:text-gray-400">Mostrar comentarios...</p>
-        </div>
-      )}
-
-      {/* Modal de suscripción */}
-      {showSubscriptionPrompt && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              Suscríbete para ver el contenido completo
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Accede a todo el contenido exclusivo de {username} por solo ${subscriptionPrice}/mes
-            </p>
-            <div className="flex space-x-4">
-              <button
-                onClick={() => setShowSubscriptionPrompt(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-              >
-                Cancelar
-              </button>
-              <Link
-                href={`/profile/${creatorId}/subscribe`}
-                className="flex-1 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg text-center transition"
-              >
-                Suscribirse
-              </Link>
-            </div>
-          </div>
         </div>
       )}
     </article>

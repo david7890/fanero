@@ -11,8 +11,10 @@ export default function NotFound() {
       <div className="max-w-4xl mx-auto px-4 pt-[120px] pb-8 flex flex-col items-center text-center">
         <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md w-full max-w-lg p-8">
           {/* Número 404 grande */}
-          <h1 className="text-[120px] font-bold leading-none bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
-            404
+          <h1 className="text-[120px] font-bold leading-none text-gray-900 dark:text-white">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+              404
+            </span>
           </h1>
           
           {/* Mensaje de página no encontrada */}

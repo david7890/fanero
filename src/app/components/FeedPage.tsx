@@ -49,7 +49,7 @@ export default function FeedPage() {
         <div className="flex justify-between items-center my-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Novedades</h1>
           <a 
-            href="/explore" 
+            href="/" 
             className="btn bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-full flex items-center space-x-1 transition shadow-sm dark:bg-blue-600 dark:hover:bg-blue-700"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
