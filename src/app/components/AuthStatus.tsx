@@ -63,9 +63,14 @@ export default function AuthStatus() {
               unoptimized
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-primary text-white">
-              {session?.user?.name?.charAt(0) || session?.user?.email?.charAt(0) || '?'}
-            </div>
+            <Image 
+              src="/avatar-placeholder.png" 
+              alt="Avatar predeterminado"
+              width={32}
+              height={32}
+              className="w-full h-full object-cover"
+              unoptimized
+            />
           )}
         </div>
         <span className="text-gray-800 dark:text-gray-200">

@@ -436,7 +436,7 @@ export default function ProfilePage() {
                 />
               ) : (
                 <Image 
-                  src="/avatar-placeholder.jpg"
+                  src="/avatar-placeholder.png"
                   alt="Avatar placeholder"
                   width={160}
                   height={160}
@@ -647,8 +647,8 @@ export default function ProfilePage() {
                   <PostCard
                     key={post.id}
                     username={post.user.name}
-                    avatarSrc={post.user.image || "/avatar-placeholder.jpg"}
-                    imageSrc={post.imageUrl || "/post-placeholder.jpg"}
+                    avatarSrc={post.user.image || "/avatar-placeholder.png"}
+                    imageSrc={post.imageUrl || ""}
                     content={post.content}
                     likesCount={post._count?.likes || 0}
                     commentsCount={post._count?.comments || 0}

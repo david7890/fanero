@@ -9,7 +9,7 @@ const MOCK_POSTS = [
   {
     id: 1,
     username: 'artista_digital',
-    avatarSrc: '/avatar-placeholder.jpg',
+    avatarSrc: '/avatar-placeholder.png',
     imageSrc: '/post-1.jpg',
     content: 'Estoy muy emocionado de compartir mi último trabajo digital. ¡Me encantaría saber qué piensan!',
     likesCount: 42,
@@ -19,7 +19,7 @@ const MOCK_POSTS = [
   {
     id: 2,
     username: 'fotografo_nature',
-    avatarSrc: '/avatar-placeholder.jpg',
+    avatarSrc: '/avatar-placeholder.png',
     imageSrc: '/post-2.jpg',
     content: 'Capturé este amanecer durante mi último viaje a las montañas. La luz natural es simplemente mágica.',
     likesCount: 78,
@@ -29,7 +29,7 @@ const MOCK_POSTS = [
   {
     id: 3,
     username: 'escritor_creativo',
-    avatarSrc: '/avatar-placeholder.jpg',
+    avatarSrc: '/avatar-placeholder.png',
     imageSrc: '/post-3.jpg',
     content: 'Acabo de terminar el primer borrador de mi novela. Ha sido un largo viaje, pero finalmente puedo ver la luz al final del túnel. Gracias a todos por su apoyo constante.',
     likesCount: 124,

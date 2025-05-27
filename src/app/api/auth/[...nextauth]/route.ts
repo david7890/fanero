@@ -110,6 +110,19 @@ export const authOptions: NextAuthOptions = {
         return true;
       }
       
+      // Si el usuario no tiene imagen, establecer la imagen predeterminada
+      if (!user.image) {
+        user.image = '/avatar-placeholder.png';
+        
+        // Actualizar la imagen en la base de datos si el usuario ya existe
+        if (user.id) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { image: user.image }
+          });
+        }
+      }
+      
       // Para proveedores de OAuth, vincular con cuenta existente si el email coincide
       if (account?.provider && user.email) {
         const existingUser = await prisma.user.findUnique({

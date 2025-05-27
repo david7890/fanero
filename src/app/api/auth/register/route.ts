@@ -36,7 +36,7 @@ export async function POST(request: Request) {
         name,
         email,
         password: hashedPassword,
-        image: "/avatar-placeholder.jpg", // Imagen por defecto
+        image: "/avatar-placeholder.png", // Cambiado de .jpg a .png
       },
     });
 

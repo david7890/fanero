@@ -79,7 +79,7 @@ const PostCard = memo(function PostCard({
       <div className="p-4 flex items-center space-x-3">
         <div className="relative w-10 h-10">
           <Image
-            src={avatarSrc || "/avatar-placeholder.jpg"}
+            src={avatarSrc || "/avatar-placeholder.png"}
             alt="Avatar"
             className="rounded-full object-cover"
             fill

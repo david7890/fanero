@@ -30,7 +30,7 @@ export default function SettingsPage() {
         if (response.ok) {
           const data = await response.json();
           setUserData(data);
-          setPreviewImage(data.image || '/avatar-placeholder.jpg');
+          setPreviewImage(data.image || '/avatar-placeholder.png');
         }
       } catch (error) {
         setError('Error al cargar los datos del usuario');
