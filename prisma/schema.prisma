@@ -179,3 +179,12 @@ model Subscription {
 
   @@unique([creatorId, subscriberId])
 }
+
+// Modelo para tokens de restablecimiento de contraseña
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  expires   DateTime
+  createdAt DateTime @default(now())
+}

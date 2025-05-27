@@ -9,6 +9,7 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const registered = searchParams.get("registered");
+  const passwordReset = searchParams.get("passwordReset");
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   
   const [email, setEmail] = useState("");
@@ -23,7 +24,10 @@ export default function LoginPage() {
     if (registered) {
       setSuccess("¡Registro exitoso! Ahora puedes iniciar sesión con tus credenciales.");
     }
-  }, [registered]);
+    if (passwordReset) {
+      setSuccess("¡Contraseña actualizada correctamente! Ahora puedes iniciar sesión con tu nueva contraseña.");
+    }
+  }, [registered, passwordReset]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,14 +143,9 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <div className="flex justify-between mb-2">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Contraseña
-              </label>
-              <Link href="/auth/forgot-password" className="text-sm text-primary hover:text-primary-dark transition-colors">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Contraseña
+            </label>
             <input
               id="password"
               type="password"
@@ -156,6 +155,11 @@ export default function LoginPage() {
               placeholder="••••••••"
               required
             />
+            <div className="flex justify-end mt-1">
+              <Link href="/auth/forgot-password" className="text-xs text-primary hover:text-primary-dark font-medium transition-colors">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
           </div>
 
           <button

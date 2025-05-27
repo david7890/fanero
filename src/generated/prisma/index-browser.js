@@ -223,6 +223,14 @@ exports.Prisma.SubscriptionScalarFieldEnum = {
   subscriberId: 'subscriberId'
 };
 
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  token: 'token',
+  email: 'email',
+  expires: 'expires',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -260,7 +268,8 @@ exports.Prisma.ModelName = {
   Donation: 'Donation',
   Follow: 'Follow',
   VerificationToken: 'VerificationToken',
-  Subscription: 'Subscription'
+  Subscription: 'Subscription',
+  PasswordResetToken: 'PasswordResetToken'
 };
 
 /**
